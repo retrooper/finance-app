@@ -5,17 +5,10 @@ import TransactionItem from './TransactionItem';
 export default function Transactions() {
   //let weatherData = getWeatherData();
 
-  let cityNamePromise = getCityName();
-  cityNamePromise.then(function(result) {
-    // here you can use the result of promiseB
-    console.log("output: " + result)
-  });
-  setTimeout(() => {
-    console.log('city name: ' + cityNamePromise);
-  }, 1000);
+  console.log("name: " + getCityName())
   const data = [
     {
-      title: cityNamePromise,
+      title: "test",
       location: 'Kihei, HI',
       date: 'Today, 13:21',
       amount: (Math.random() * 10).toFixed(2),
@@ -58,6 +51,26 @@ export default function Transactions() {
     },
   ];
 
+async function getCityName() {
+  if (navigator.geolocation) {
+    navigator.geolocation
+      .getCurrentPosition(async function (position) {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+
+        const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`;
+
+        return await fetch(url)
+          .then((response) => response.json())
+          .then((json) => {
+              console.log(json["city"])
+            });
+      })
+  } else {
+    console.log('geo off?!');
+  }
+}
+
   return (
     <FlatList
       data={data}
@@ -72,31 +85,6 @@ export default function Transactions() {
       stickyHeaderIndices={[0]}
     />
   );
-}
-
-async function getCityName() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(async function (position) {
-      const latitude = position.coords.latitude;
-      const longitude = position.coords.longitude;
-      
-        const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=YOUR_API_KEY`;
-
-      fetch(url)
-      .then((response) => response.json())
-        .then((data) => {
-        // Parse the city name from the API response
-        const city = data.results[0].address_components.find((component) =>
-          component.types.includes("locality")
-        ).long_name;
-
-        console.log(`Your city is ${city}.`);
-    })
-    .catch((error) => console.log(error));
-    });
-  } else {
-    console.log('geo off?!');
-  }
 }
 
 async function getWeatherData() {
@@ -117,6 +105,7 @@ async function getWeatherData() {
       }
 
       const json = response.json();
+
       console.log(json);
     });
   }
