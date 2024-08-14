@@ -1,13 +1,16 @@
 import { FlatList, View, StyleSheet, Text } from 'react-native';
 import { useState, useEffect } from 'react';
 import TransactionItem from './TransactionItem';
+import * as Location from 'expo-location';
 
 export default function Transactions() {
   //let weatherData = getWeatherData();
+  const [location, setLocation] = useState(null);
+  const [render_data, set_render_data] = useState(false);
   const [data, set_data] = useState([
     {
-      title: 'test',
-      location: 'Kihei, HI',
+      title: 'Loading...',
+      location: 'Loading...',
       date: 'Today, 13:21',
       amount: (Math.random() * 10).toFixed(2),
       icon: '#FB8E41',
@@ -44,79 +47,89 @@ export default function Transactions() {
 
   useEffect(() => {
     async function processWeatherData() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(async function (position) {
-          const latitude = position.coords.latitude;
-          const longitude = position.coords.longitude;
-          const response = await fetch(
-            'https://api.openweathermap.org/data/2.5/forecast?lat=' +
-              latitude +
-              '&lon=' +
-              longitude +
-              '&appid=d881ba1571fd259dcb9b7676c74e6655&units=metric'
-          );
-          if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
-          }
-
-          const json = await response.json();
-
-          dataCopy = [...data];
-          let date = new Date();
-          let i = 0;
-          dataCopy.forEach((d) => {
-            date.setDate(date.getDate() + 1);
-            if (i == 0) {
-              d.location = 'Tomorrow';
-            } else {
-              d.location = date.toLocaleDateString('en-GB');
-            }
-
-            i = 0;
-            //console.log("list: " + JSON.stringify(json['list']))
-            json['list'].forEach((element) => {
-              let theDate = new Date(element['dt'] * 1000);
-              if (
-                theDate.toLocaleDateString('en-GB') ==
-                date.toLocaleDateString('en-GB')
-              ) {
-                //console.log("element: " + element['dt'] + ", date: " + theDate.toLocaleDateString('en-GB'));
-                d.date = 'Temperature: ' + Math.round(element['main']['temp']) + "°C";
-                i++;
-              }
-            });
-            i++;
-          });
-          set_data(dataCopy);
-
-          console.log(
-            'json: ' + JSON.stringify(json['list'][0]['main']['temp'])
-          );
-        });
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Permission to access location was denied');
+        return;
       }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+
+      const latitude = location['coords']['latitude'];
+      const longitude = location['coords']['longitude'];
+      const response = await fetch(
+        'https://api.openweathermap.org/data/2.5/forecast?lat=' +
+          latitude +
+          '&lon=' +
+          longitude +
+          '&appid=d881ba1571fd259dcb9b7676c74e6655&units=metric'
+      );
+      if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
+      }
+
+      const json = await response.json();
+
+      dataCopy = [...data];
+      let date = new Date();
+      let i = 0;
+      dataCopy.forEach((d) => {
+        date.setDate(date.getDate() + 1);
+        if (i == 0) {
+          d.location = 'Tomorrow';
+        } else {
+          d.location = date.toLocaleDateString('en-GB');
+        }
+
+        d.amount = undefined;
+
+        i = 0;
+        //console.log('list: ' + JSON.stringify(json['list']));
+        json['list'].forEach((element) => {
+          let theDate = new Date(element['dt'] * 1000);
+          if (
+            theDate.toLocaleDateString('en-GB') ==
+            date.toLocaleDateString('en-GB')
+          ) {
+            //console.log("element: " + element['dt'] + ", date: " + theDate.toLocaleDateString('en-GB'));
+            d.date =
+              'Temperature: ' + Math.round(element['main']['temp']) + '°C';
+            i++;
+          }
+        });
+        i++;
+      });
+      set_data(dataCopy);
+
+      set_render_data(true);
     }
 
     async function processCityName() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(async function (position) {
-          const latitude = position.coords.latitude;
-          const longitude = position.coords.longitude;
-
-          const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`;
-
-          return await fetch(url)
-            .then((response) => response.json())
-            .then((json) => {
-              dataCopy = [...data];
-              dataCopy.forEach((d) => {
-                d.title = json['city'];
-              });
-              set_data(dataCopy);
-            });
-        });
-      } else {
-        console.log('geo off?!');
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Permission to access location was denied');
+        return;
       }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+
+      const latitude = location['coords']['latitude'];
+      const longitude = location['coords']['longitude'];
+
+      const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`;
+      
+
+      return await fetch(url)
+        .then((response) => response.json())
+        .then((json) => {
+          dataCopy = [...data];
+          dataCopy.forEach((d) => {
+            d.title = json['city'];
+          });
+          set_data(dataCopy);
+        });
     }
 
     processCityName();
@@ -125,7 +138,7 @@ export default function Transactions() {
 
   return (
     <FlatList
-      data={data}
+      data={render_data ? data : []}
       style={{ flex: 1 }}
       renderItem={({ item }) => <TransactionItem data={item} />}
       keyExtractor={(item) => item.date}

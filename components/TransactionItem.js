@@ -13,7 +13,11 @@ export default function TransactionItem({ data }) {
             <Text style={styles.date}>{data.date}</Text>
           </View>
         </View>
-        <Text style={styles.amount}>${data.amount}</Text>
+        {
+        /*
+         * Had a $ sign
+        */}
+        <Text style={styles.amount}>{data.amount}</Text>
       </View>
     </View>
   );
