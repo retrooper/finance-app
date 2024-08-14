@@ -24,9 +24,9 @@ export default function Balance() {
     <Pressable style={styles.container} onPress={forceUpdate}>
       <View style={styles.layout}>
         <View>
-          <Text style={styles.title}>Card balance</Text>
+          <Text style={styles.title}>Date</Text>
           <Text style={styles.balance}>
-            ${currentBalance.toFixed(2)}
+            {new Date().toLocaleDateString()}
           </Text>
         </View>
         <LineChart

@@ -11,7 +11,7 @@ export default function Transactions() {
       keyExtractor={(item) => item.date}
       ListHeaderComponent={() => (
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Latest transactions</Text>
+          <Text style={styles.headerTitle}>Weather Reports</Text>
         </View>
       )}
       stickyHeaderIndices={[0]}
@@ -21,7 +21,7 @@ export default function Transactions() {
 
 const data = [
   {
-    title: 'Akamai Coffee Shop',
+    title: 'unknown',
     location: 'Kihei, HI',
     date: 'Today, 13:21',
     amount: (Math.random() * 10).toFixed(2),
