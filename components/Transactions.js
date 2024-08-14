@@ -1,4 +1,4 @@
-  import { FlatList, View, StyleSheet, Text } from 'react-native';
+import { FlatList, View, StyleSheet, Text } from 'react-native';
 import { useState, useEffect } from 'react';
 import TransactionItem from './TransactionItem';
 
@@ -40,18 +40,63 @@ export default function Transactions() {
       amount: (Math.random() * 15).toFixed(2),
       icon: '#FB8E41',
     },
-    {
-      title: "Tante's Fishmarket",
-      location: 'Wailuku, HI',
-      date: 'Monday',
-      amount: (Math.random() * 10).toFixed(2),
-      icon: '#0091FF',
-    },
   ]);
 
   useEffect(() => {
+    async function processWeatherData() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async function (position) {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+          const response = await fetch(
+            'https://api.openweathermap.org/data/2.5/forecast?lat=' +
+              latitude +
+              '&lon=' +
+              longitude +
+              '&appid=d881ba1571fd259dcb9b7676c74e6655&units=metric'
+          );
+          if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+          }
+
+          const json = await response.json();
+
+          dataCopy = [...data];
+          let date = new Date();
+          let i = 0;
+          dataCopy.forEach((d) => {
+            date.setDate(date.getDate() + 1);
+            if (i == 0) {
+              d.location = 'Tomorrow';
+            } else {
+              d.location = date.toLocaleDateString('en-GB');
+            }
+
+            i = 0;
+            //console.log("list: " + JSON.stringify(json['list']))
+            json['list'].forEach((element) => {
+              let theDate = new Date(element['dt'] * 1000);
+              if (
+                theDate.toLocaleDateString('en-GB') ==
+                date.toLocaleDateString('en-GB')
+              ) {
+                //console.log("element: " + element['dt'] + ", date: " + theDate.toLocaleDateString('en-GB'));
+                d.date = 'Temperature: ' + Math.round(element['main']['temp']) + "°C";
+                i++;
+              }
+            });
+            i++;
+          });
+          set_data(dataCopy);
+
+          console.log(
+            'json: ' + JSON.stringify(json['list'][0]['main']['temp'])
+          );
+        });
+      }
+    }
+
     async function processCityName() {
-      console.log("hey")
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(async function (position) {
           const latitude = position.coords.latitude;
@@ -62,11 +107,10 @@ export default function Transactions() {
           return await fetch(url)
             .then((response) => response.json())
             .then((json) => {
-
-              dataCopy = [...data]
+              dataCopy = [...data];
               dataCopy.forEach((d) => {
-                d.title = json["city"]
-              })
+                d.title = json['city'];
+              });
               set_data(dataCopy);
             });
         });
@@ -75,10 +119,9 @@ export default function Transactions() {
       }
     }
 
-    console.log('name: ' + processCityName());
-
+    processCityName();
+    processWeatherData();
   }, []);
-
 
   return (
     <FlatList
@@ -94,29 +137,6 @@ export default function Transactions() {
       stickyHeaderIndices={[0]}
     />
   );
-}
-async function getWeatherData() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(async function (position) {
-      const latitude = position.coords.latitude;
-      const longitude = position.coords.longitude;
-      console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
-      const response = await fetch(
-        'https://api.openweathermap.org/data/2.5/forecast?lat=' +
-          latitude +
-          '&lon=' +
-          longitude +
-          '&appid=d881ba1571fd259dcb9b7676c74e6655'
-      );
-      if (!response.ok) {
-        throw new Error(`Response status: ${response.status}`);
-      }
-
-      const json = response.json();
-
-      console.log(json);
-    });
-  }
 }
 
 const styles = StyleSheet.create({
