@@ -1,14 +1,12 @@
-import { FlatList, View, StyleSheet, Text } from 'react-native';
-
+  import { FlatList, View, StyleSheet, Text } from 'react-native';
+import { useState, useEffect } from 'react';
 import TransactionItem from './TransactionItem';
 
 export default function Transactions() {
   //let weatherData = getWeatherData();
-
-  console.log("name: " + getCityName())
-  const data = [
+  const [data, set_data] = useState([
     {
-      title: "test",
+      title: 'test',
       location: 'Kihei, HI',
       date: 'Today, 13:21',
       amount: (Math.random() * 10).toFixed(2),
@@ -49,27 +47,38 @@ export default function Transactions() {
       amount: (Math.random() * 10).toFixed(2),
       icon: '#0091FF',
     },
-  ];
+  ]);
 
-async function getCityName() {
-  if (navigator.geolocation) {
-    navigator.geolocation
-      .getCurrentPosition(async function (position) {
-        const latitude = position.coords.latitude;
-        const longitude = position.coords.longitude;
+  useEffect(() => {
+    async function processCityName() {
+      console.log("hey")
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async function (position) {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
 
-        const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`;
+          const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`;
 
-        return await fetch(url)
-          .then((response) => response.json())
-          .then((json) => {
-              console.log(json["city"])
+          return await fetch(url)
+            .then((response) => response.json())
+            .then((json) => {
+
+              dataCopy = [...data]
+              dataCopy.forEach((d) => {
+                d.title = json["city"]
+              })
+              set_data(dataCopy);
             });
-      })
-  } else {
-    console.log('geo off?!');
-  }
-}
+        });
+      } else {
+        console.log('geo off?!');
+      }
+    }
+
+    console.log('name: ' + processCityName());
+
+  }, []);
+
 
   return (
     <FlatList
@@ -86,7 +95,6 @@ async function getCityName() {
     />
   );
 }
-
 async function getWeatherData() {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(async function (position) {
