@@ -2,9 +2,12 @@ import { FlatList, View, StyleSheet, Text } from 'react-native';
 import { useState, useEffect } from 'react';
 import TransactionItem from './TransactionItem';
 import * as Location from 'expo-location';
+import Balance from './Balance';
+
 
 export default function Transactions() {
   //let weatherData = getWeatherData();
+  const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const [location, setLocation] = useState(null);
   const [render_data, set_render_data] = useState(false);
   const [data, set_data] = useState([
@@ -12,6 +15,13 @@ export default function Transactions() {
       title: 'Loading...',
       location: 'Loading...',
       date: 'Today, 13:21',
+      amount: (Math.random() * 10).toFixed(2),
+      icon: '#FB8E41',
+    },
+    {
+      title: 'Loading...',
+      location: 'Loading...',
+      date: 'Tmr, 13:21',
       amount: (Math.random() * 10).toFixed(2),
       icon: '#FB8E41',
     },
@@ -73,18 +83,20 @@ export default function Transactions() {
 
       dataCopy = [...data];
       let date = new Date();
-      let i = 0;
-      dataCopy.forEach((d) => {
-        date.setDate(date.getDate() + 1);
+      for (i = 0; i < dataCopy.length; i++) {
+        let d  = dataCopy[i]
         if (i == 0) {
-          d.location = 'Tomorrow';
-        } else {
-          d.location = date.toLocaleDateString('en-GB');
+          d.location = 'Today';
+        } 
+        else if(i == 1){
+          d.location = "Tomorrow"
+        }
+        else {
+          d.location = date.toLocaleDateString('en-GB') + " - " + daysOfWeek[date.getDay()];
         }
 
         d.amount = undefined;
 
-        i = 0;
         //console.log('list: ' + JSON.stringify(json['list']));
         json['list'].forEach((element) => {
           let theDate = new Date(element['dt'] * 1000);
@@ -95,11 +107,10 @@ export default function Transactions() {
             //console.log("element: " + element['dt'] + ", date: " + theDate.toLocaleDateString('en-GB'));
             d.date =
               'Temperature: ' + Math.round(element['main']['temp']) + '°C';
-            i++;
           }
         });
-        i++;
-      });
+        date.setDate(date.getDate() + 1);
+      }
       set_data(dataCopy);
 
       set_render_data(true);

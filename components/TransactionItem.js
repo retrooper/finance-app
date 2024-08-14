@@ -6,7 +6,7 @@ export default function TransactionItem({ data }) {
     <View style={styles.container}>
       <View style={styles.layout}>
         <View style={styles.contentLayout}>
-          <View style={[styles.icon, { backgroundColor: data.icon }]} />
+          <View style={[styles.icon, { backgroundColor: 'rgb(30 58 138)'}]} />
           <View>
             <Text style={styles.title}>{data.title}</Text>
             <Text style={styles.location}>{data.location}</Text>
@@ -45,16 +45,16 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: '700',
     marginBottom: 6,
-    color: 'rgb(250 250 250)'
+    color: 'rgb(238 242 255)'
   },
   location: {
-    color: 'rgb(250 250 250)',
+    color: 'rgb(238 242 255)',
     marginBottom: 6,
   },
   date: {
-    color: 'rgb(250 250 250)',
+    color: 'rgb(238 242 255)',
     fontSize: 13,
   },
   amount: {
