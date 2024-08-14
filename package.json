@@ -19,10 +19,10 @@
     "react-native-card-flip": "*",
     "react-native-chart-kit": "*",
     "react-native-reanimated": "~2.12.0",
+    "react-native-track-player": "^3.2.0",
     "react-native-gesture-handler": "~2.8.0",
     "react-native-animated-numbers": "*",
-    "@react-native-community/slider": "4.2.4",
-    "react-native-track-player": "^3.2.0"
+    "@react-native-community/slider": "4.2.4"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

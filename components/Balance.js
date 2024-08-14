@@ -15,6 +15,7 @@ const currentBalance = 10;
 export default function Balance() {
   const [, regenerateRadomData] = useState();
   const forceUpdate = useCallback(() => regenerateRadomData({}), []);
+  
 
   const data = [
     currentBalance
