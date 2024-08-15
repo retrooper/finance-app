@@ -10,14 +10,12 @@ import {
 import { LineChart } from 'react-native-chart-kit';
 
 export default function Balance() {
-  const [, regenerateRadomData] = useState();
-  const forceUpdate = useCallback(() => regenerateRadomData({}), []);
 
   const [data, set_data] = useState([new Date().toLocaleDateString()])
   
 
   return (
-    <Pressable style={styles.container} onPress={forceUpdate}>
+    <Pressable style={styles.container} onPress={() => {}}>
       <View style={styles.layout}>
         <View>
           <Text style={styles.title}>Date</Text>
@@ -64,9 +62,9 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderStyle: 'solid',
     borderColor: 'rgb(30 58 138)',
-    shadowColor: '#000',
+    shadowColor: 'rgb(107 114 128)',
     shadowOffset: {
-      width: 0,
+      width: 1,
       height: 2,
     },
     shadowOpacity: 0.05,
@@ -75,16 +73,18 @@ const styles = StyleSheet.create({
     marginBottom: Platform.select({
       native: 12,
     }),
+        marginTop: -70,
+
   },
   layout: {
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-  },
+    alignItems: 'center'
+      },
   title: {
-    marginBottom: 6,
-    color: "rgb(250 250 250)"
+    marginBottom: 4,
+    color: "rgb(250 250 250)",
   },
   balance: {
     fontSize: 28,

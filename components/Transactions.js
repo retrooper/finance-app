@@ -165,7 +165,7 @@ export default function Transactions() {
 
 const styles = StyleSheet.create({
   header: {
-    paddingVertical: 12,
+    paddingVertical: 35,
     paddingHorizontal: 20,
     backgroundColor: 'rgb(39 39 42)',
     borderBottomWidth: 1,

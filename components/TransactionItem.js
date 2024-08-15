@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet } from 'react-native';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 
 export default function TransactionItem({ data }) {
@@ -6,7 +7,7 @@ export default function TransactionItem({ data }) {
     <View style={styles.container}>
       <View style={styles.layout}>
         <View style={styles.contentLayout}>
-          <View style={[styles.icon, { backgroundColor: 'rgb(30 58 138)'}]} />
+            <View style={[styles.icon, { backgroundColor: 'rgb(30 58 138)'}]} />
           <View>
             <Text style={styles.title}>{data.title}</Text>
             <Text style={styles.location}>{data.location}</Text>
@@ -25,7 +26,7 @@ export default function TransactionItem({ data }) {
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 16,
+    paddingVertical: 26,
     paddingHorizontal: 20,
     backgroundColor: 'rgb(39 39 42)',
     borderBottomWidth: 1,
