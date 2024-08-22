@@ -1,8 +1,5 @@
 import {
   StyleSheet,
-  Text,
-  View,
-  Pressable,
   Platform,
   Image,
 } from 'react-native';

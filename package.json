@@ -8,25 +8,24 @@
   },
   "dependencies": {
     "expo": "~51.0.28",
-    "expo-status-bar": "~1.4.2",
+    "expo-status-bar": "~1.12.1",
     "react": "18.2.0",
     "react-native": "0.74.5",
     "expo-location": "~17.0.1",
-    "expo-constants": "~14.0.2",
-    "react-native-svg": "15.5.0",
-    "@expo/vector-icons": "^13.0.0",
+    "expo-constants": "~16.0.2",
+    "react-native-svg": "15.2.0",
+    "@expo/vector-icons": "^14.0.2",
     "react-native-paper": "4.9.2",
-    "expo-linear-gradient": "~12.0.1",
     "react-native-card-flip": "*",
     "react-native-chart-kit": "*",
-    "react-native-reanimated": "~2.12.0",
+    "react-native-reanimated": "~3.10.1",
     "react-native-track-player": "^3.2.0",
-    "react-native-gesture-handler": "~2.8.0",
     "react-native-animated-numbers": "*",
     "@fortawesome/react-fontawesome": "*",
-    "@react-native-community/slider": "4.2.4",
+    "@react-native-community/slider": "4.5.2",
     "@fortawesome/fontawesome-svg-core": "*",
-    "@fortawesome/free-solid-svg-icons": "*"
+    "@fortawesome/free-solid-svg-icons": "*",
+    "expo-linear-gradient": "~13.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

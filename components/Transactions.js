@@ -1,79 +1,66 @@
-import { FlatList, View, StyleSheet, Text } from 'react-native';
-import { useState, useEffect } from 'react';
-import TransactionItem from './TransactionItem';
-import * as Location from 'expo-location';
-import Balance from './Balance';
-
+import { FlatList, View, StyleSheet, Text } from "react-native";
+import { useState, useEffect } from "react";
+import TransactionItem from "./TransactionItem";
+import * as Location from "expo-location";
+import Balance from "./Balance";
 
 export default function Transactions() {
   //let weatherData = getWeatherData();
-  const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const daysOfWeek = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
   const [location, setLocation] = useState(null);
   const [render_data, set_render_data] = useState(false);
+
+  let loadingDataPlaceholder = {
+    title: "Loading...",
+    location: "Loading...",
+    date: "Loading..",
+    amount: undefined,
+    icon: "#FB8E41",
+  };
+
+  //TODO Add API KEY
+  const apiKey = "";
+
   const [data, set_data] = useState([
-    {
-      title: 'Loading...',
-      location: 'Loading...',
-      date: 'Today, 13:21',
-      amount: (Math.random() * 10).toFixed(2),
-      icon: '#FB8E41',
-    },
-    {
-      title: 'Loading...',
-      location: 'Loading...',
-      date: 'Tmr, 13:21',
-      amount: (Math.random() * 10).toFixed(2),
-      icon: '#FB8E41',
-    },
-    {
-      title: 'Shops at Wailea',
-      location: 'Wailea, HI',
-      date: 'Yesterday, 20:07',
-      amount: (Math.random() * 25).toFixed(2),
-      icon: '#0091FF',
-    },
-    {
-      title: 'Ono Hawaiian BBQ',
-      location: 'Paia, HI',
-      date: 'Thursday',
-      amount: (Math.random() * 100).toFixed(2),
-      icon: '#34D058',
-    },
-    {
-      title: 'Fond',
-      location: 'Lahaina, HI',
-      date: 'Wensday',
-      amount: (Math.random() * 10).toFixed(2),
-      icon: '#34D058',
-    },
-    {
-      title: 'Ula’Ula Cafe',
-      location: 'Waihee-Waiehu, HI',
-      date: 'Tuesday',
-      amount: (Math.random() * 15).toFixed(2),
-      icon: '#FB8E41',
-    },
+    Object.assign({}, loadingDataPlaceholder),
+    Object.assign({}, loadingDataPlaceholder),
+    Object.assign({}, loadingDataPlaceholder),
+    Object.assign({}, loadingDataPlaceholder),
+    Object.assign({}, loadingDataPlaceholder),
+    Object.assign({}, loadingDataPlaceholder),
   ]);
 
   useEffect(() => {
     async function processWeatherData() {
       let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
         return;
       }
 
       let location = await Location.getCurrentPositionAsync({});
       setLocation(location);
 
-      const latitude = location['coords']['latitude'];
-      const longitude = location['coords']['longitude'];
-      const response = await fetch(
-        'https://api.openweathermap.org/data/2.5/forecast?lat=' +
+      const latitude = location["coords"]["latitude"];
+      const longitude = location["coords"]["longitude"];
+
+      //Get weather data
+      let response = await fetch(
+        "https://api.openweathermap.org/data/2.5/forecast?lat=" +
           latitude +
-          '&lon=' +
+          "&lon=" +
           longitude +
-          '&appid=d881ba1571fd259dcb9b7676c74e6655&units=metric'
+          "&appid=" +
+          apiKey +
+          "&units=metric"
       );
       if (!response.ok) {
         throw new Error(`Response status: ${response.status}`);
@@ -81,32 +68,51 @@ export default function Transactions() {
 
       const json = await response.json();
 
+      //Get city name data
+      const response2 = await fetch(
+        `http://api.openweathermap.org/geo/1.0/reverse?lat=` +
+          latitude +
+          `&lon=` +
+          longitude +
+          `&limit=100&appid=` +
+          apiKey
+      );
+
+      if (!response2.ok) {
+        throw new Error(`Response status: ${response2.status}`);
+      }
+      const cityNameDataJson = await response2.json();
+
       dataCopy = [...data];
+      const locationName = cityNameDataJson[0]["name"];
+
       let date = new Date();
-      for (i = 0; i < dataCopy.length; i++) {
-        let d  = dataCopy[i]
+      for (let i = 0; i < dataCopy.length; i++) {
+        let d = dataCopy[i];
+        d.title = locationName;
         if (i == 0) {
-          d.location = 'Today';
-        } 
-        else if(i == 1){
-          d.location = "Tomorrow"
-        }
-        else {
-          d.location = date.toLocaleDateString('en-GB') + " - " + daysOfWeek[date.getDay()];
+          d.location = "Today";
+        } else if (i == 1) {
+          d.location = "Tomorrow";
+        } else {
+          d.location =
+            date.toLocaleDateString("en-GB") +
+            " - " +
+            daysOfWeek[date.getDay()];
         }
 
         d.amount = undefined;
 
         //console.log('list: ' + JSON.stringify(json['list']));
-        json['list'].forEach((element) => {
-          let theDate = new Date(element['dt'] * 1000);
+        json["list"].forEach((element) => {
+          let theDate = new Date(element["dt"] * 1000);
           if (
-            theDate.toLocaleDateString('en-GB') ==
-            date.toLocaleDateString('en-GB')
+            theDate.toLocaleDateString("en-GB") ==
+            date.toLocaleDateString("en-GB")
           ) {
             //console.log("element: " + element['dt'] + ", date: " + theDate.toLocaleDateString('en-GB'));
             d.date =
-              'Temperature: ' + Math.round(element['main']['temp']) + '°C';
+              "Temperature: " + Math.round(element["main"]["temp"]) + "°C";
           }
         });
         date.setDate(date.getDate() + 1);
@@ -116,34 +122,6 @@ export default function Transactions() {
       set_render_data(true);
     }
 
-    async function processCityName() {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
-        return;
-      }
-
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
-
-      const latitude = location['coords']['latitude'];
-      const longitude = location['coords']['longitude'];
-
-      const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`;
-      
-
-      return await fetch(url)
-        .then((response) => response.json())
-        .then((json) => {
-          dataCopy = [...data];
-          dataCopy.forEach((d) => {
-            d.title = json['city'];
-          });
-          set_data(dataCopy);
-        });
-    }
-
-    processCityName();
     processWeatherData();
   }, []);
 
@@ -167,12 +145,12 @@ const styles = StyleSheet.create({
   header: {
     paddingVertical: 35,
     paddingHorizontal: 20,
-    backgroundColor: 'rgb(39 39 42)',
+    backgroundColor: "rgb(39 39 42)",
     borderBottomWidth: 1,
-    borderBottomStyle: 'solid',
-    borderBottomColor: '#ddd',
+    borderBottomStyle: "solid",
+    borderBottomColor: "#ddd",
   },
   headerTitle: {
-    color: '#666',
+    color: "#666",
   },
 });
